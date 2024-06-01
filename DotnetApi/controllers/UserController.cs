@@ -15,12 +15,6 @@ public class UserController : ControllerBase
     _dapper = new DataContextDapper(config);
   }
 
-  [HttpGet("test.connection")]
-  public DateTime TestConnection()
-  {
-    return _dapper.LoadDataSingle<DateTime>("SELECT GETDATE()");
-  }
-
   [HttpGet("get.users")]
   public IEnumerable<User> GetUsers()
   {
@@ -38,7 +32,7 @@ public class UserController : ControllerBase
   }
 
   [HttpGet("get.user/{id}")]
-  public User GetUsers(int id)
+  public User GetUser(int id)
   {
     string sql = $@"
     SELECT [UserId],
