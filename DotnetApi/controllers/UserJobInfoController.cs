@@ -28,8 +28,8 @@ public class UserJobInfoController : ControllerBase
     return usersJobInfo;
   }
 
-  [HttpGet("get.user.job.info")]
-  public IEnumerable<UserJobInfo> GetUserJobInfo(int id)
+  [HttpGet("get.user.job.info/{id}")]
+  public UserJobInfo GetUserJobInfo(int id)
   {
     string sql = $@"
     SELECT  [UserId],
@@ -38,7 +38,7 @@ public class UserJobInfoController : ControllerBase
     FROM  AppSchema.UserJobInfo
     WHERE [UserId] = {id};
     ";
-    IEnumerable<UserJobInfo> userJobInfo = _dapper.LoadData<UserJobInfo>(sql);
+    UserJobInfo userJobInfo = _dapper.LoadDataSingle<UserJobInfo>(sql);
     return userJobInfo;
   }
 
