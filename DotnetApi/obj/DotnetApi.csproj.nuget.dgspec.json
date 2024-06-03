@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj": {}
+    "C:\\users\\pedro previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj": {
+    "C:\\users\\pedro previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj",
+        "projectUniqueName": "C:\\users\\pedro previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj",
         "projectName": "DotnetApi",
-        "projectPath": "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj",
+        "projectPath": "C:\\users\\pedro previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj",
         "packagesPath": "C:\\Users\\Pedro Previatti\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\obj\\",
+        "outputPath": "C:\\users\\pedro previatti\\dotnet-api\\DotnetApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Pedro Previatti\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -49,6 +49,18 @@
             "Microsoft.Data.SqlClient": {
               "target": "Package",
               "version": "[5.2.0, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.6, )"
+            },
+            "Microsoft.EntityFrameworkCore.Relational": {
+              "target": "Package",
+              "version": "[8.0.6, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.6, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
