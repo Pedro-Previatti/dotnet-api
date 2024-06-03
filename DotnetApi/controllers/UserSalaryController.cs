@@ -14,18 +14,6 @@ public class UserSalaryController : ControllerBase
     _dapper = new DataContextDapper(config);
   }
 
-  [HttpGet("get.users.salary")]
-  public IEnumerable<UserSalary> GetUserSalaries()
-  {
-    string sql = @"
-    SELECT  [UserId], 
-      CAST([Salary] AS DECIMAL(10,2)) AS [Salary] 
-    FROM  AppSchema.UserSalary;
-    ";
-    IEnumerable<UserSalary> userSalaries = _dapper.LoadData<UserSalary>(sql);
-    return userSalaries;
-  }
-
   [HttpGet("get.user.salary/{id}")]
   public UserSalary GetUserSalary(int id)
   {

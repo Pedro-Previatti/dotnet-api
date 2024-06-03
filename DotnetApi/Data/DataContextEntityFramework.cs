@@ -14,7 +14,7 @@ namespace DotnetApi.Data
 
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<UserSalary> UserSalary { get; set; }
-    public virtual DbSet<UserJobInfo> GetUserJobInfos { get; set; }
+    public virtual DbSet<UserJobInfo> UserJobInfo { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

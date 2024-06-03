@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "/ZDUDEhH1v7XSZ6pi190Hae9bsNB5qmeGf/xkxJoNE0Ak6BuofKZWDXeUmojQkdwkNkqmHgLtoVxMZNsKpGeBw==",
+  "dgSpecHash": "ym7LLPIW7kvSgPAki1t1f43apOsJ5Y6y9Te9M32Uy0LgyS1SUd6VMRmX88yQo/gwDNAsGvEY0EAnuTFDjD0trA==",
   "success": true,
   "projectFilePath": "C:\\users\\pedro previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Pedro Previatti\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\Pedro Previatti\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\Pedro Previatti\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
     "C:\\Users\\Pedro Previatti\\.nuget\\packages\\dapper\\2.1.35\\dapper.2.1.35.nupkg.sha512",
