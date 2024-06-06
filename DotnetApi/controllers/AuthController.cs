@@ -90,7 +90,7 @@ namespace DotnetApi.Controllers
       {
         if (passwordHash[i] != registeredUser.PasswordHash[i])
         {
-          StatusCode(401, "Incorrect password");
+          return StatusCode(401, "Incorrect password");
         }
       }
       return Ok();
