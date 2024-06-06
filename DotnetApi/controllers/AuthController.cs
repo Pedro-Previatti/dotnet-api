@@ -37,16 +37,7 @@ namespace DotnetApi.Controllers
             rng.GetNonZeroBytes(passwordSalt);
           }
 
-          string passwordSaltAndKey = _config.GetSection("AppSettings:PasswordKey").Value +
-            Convert.ToBase64String(passwordSalt);
-
-          byte[] passwordHash = KeyDerivation.Pbkdf2(
-            password: registrationUser.Password,
-            salt: Encoding.ASCII.GetBytes(passwordSaltAndKey),
-            prf: KeyDerivationPrf.HMACSHA256,
-            iterationCount: 1000000,
-            numBytesRequested: 256 / 8
-          );
+          byte[] passwordHash = GetPasswordHash(registrationUser.Password, passwordSalt);
 
           sql = $@"
             INSERT INTO AppSchema.Auth(
@@ -83,9 +74,39 @@ namespace DotnetApi.Controllers
     }
 
     [HttpPost("login")]
-    public IActionResult Login(LoginDto loginDto)
+    public IActionResult Login(LoginDto loginUser)
     {
+      string sql = @$"
+        SELECT [PasswordHash],
+          [PasswordSalt] 
+        FROM AppSchema.Auth WHERE Email = '{loginUser.Email}'
+      ";
+      LoginConfirmationDto registeredUser = _dapper.LoadDataSingle<LoginConfirmationDto>(sql);
+
+      byte[] passwordHash = GetPasswordHash(loginUser.Password, registeredUser.PasswordSalt);
+
+      for (int i = 0; i < passwordHash.Length; i++)
+      {
+        if (passwordHash[i] != registeredUser.PasswordHash[i])
+        {
+          StatusCode(401, "Incorrect password");
+        }
+      }
       return Ok();
+    }
+
+    private byte[] GetPasswordHash(string password, byte[] passwordSalt)
+    {
+      string passwordSaltAndKey = _config.GetSection("AppSettings:PasswordKey").Value +
+        Convert.ToBase64String(passwordSalt);
+
+      return KeyDerivation.Pbkdf2(
+            password: password,
+            salt: Encoding.ASCII.GetBytes(passwordSaltAndKey),
+            prf: KeyDerivationPrf.HMACSHA256,
+            iterationCount: 1000000,
+            numBytesRequested: 256 / 8
+          );
     }
   }
 }
