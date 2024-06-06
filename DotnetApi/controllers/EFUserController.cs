@@ -9,12 +9,12 @@ namespace DotnetAPI.Controllers
 
   [ApiController]
   [Route("[controller]")]
-  public class UserControllerEntityFramework : ControllerBase
+  public class EFUserController : ControllerBase
   {
     IUserRepository _userRepository;
     IMapper _mapper;
 
-    public UserControllerEntityFramework(IConfiguration config, IUserRepository userRepository)
+    public EFUserController(IConfiguration config, IUserRepository userRepository)
     {
       _userRepository = userRepository;
 

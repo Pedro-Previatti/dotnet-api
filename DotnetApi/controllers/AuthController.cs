@@ -6,10 +6,11 @@ using DotnetApi.Dtos;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using Microsoft.Identity.Client;
 
 namespace DotnetApi.Controllers
 {
+  [ApiController]
+  [Route("[controller]")]
   public class AuthController : ControllerBase
   {
     private readonly DataContextDapper _dapper;

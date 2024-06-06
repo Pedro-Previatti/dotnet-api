@@ -9,12 +9,12 @@ namespace DotnetApi.Controllers
 
   [ApiController]
   [Route("[controller]")]
-  public class UserSalaryControllerEntityFramework : ControllerBase
+  public class EFUserSalaryController : ControllerBase
   {
     IUserRepository _userRepository;
     IMapper _mapper;
 
-    public UserSalaryControllerEntityFramework(IConfiguration config, IUserRepository userRepository)
+    public EFUserSalaryController(IConfiguration config, IUserRepository userRepository)
     {
       _userRepository = userRepository;
 

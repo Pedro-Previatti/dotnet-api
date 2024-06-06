@@ -8,12 +8,12 @@ namespace DotnetApi.Controllers
 
   [ApiController]
   [Route("[controller]")]
-  public class UserJobInfoControllerEntityFramework : ControllerBase
+  public class EFUserJobInfoController : ControllerBase
   {
     IUserRepository _userRepository;
     IMapper _mapper;
 
-    public UserJobInfoControllerEntityFramework(IConfiguration config, IUserRepository userRepository)
+    public EFUserJobInfoController(IConfiguration config, IUserRepository userRepository)
     {
       _userRepository = userRepository;
 
