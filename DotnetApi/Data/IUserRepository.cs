@@ -1,6 +1,6 @@
 using DotnetApi.Models;
 
-namespace DotnetAPI.Data
+namespace DotnetApi.Data
 {
   public interface IUserRepository
   {

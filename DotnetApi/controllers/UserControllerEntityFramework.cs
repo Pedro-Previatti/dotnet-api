@@ -1,95 +1,97 @@
 using AutoMapper;
+using DotnetApi.Data;
 using DotnetApi.Dtos;
 using DotnetApi.Models;
-using DotnetAPI.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DotnetAPI.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class UserControllerEntityFramework : ControllerBase
+namespace DotnetAPI.Controllers
 {
-  IUserRepository _userRepository;
-  IMapper _mapper;
 
-  public UserControllerEntityFramework(IConfiguration config, IUserRepository userRepository)
+  [ApiController]
+  [Route("[controller]")]
+  public class UserControllerEntityFramework : ControllerBase
   {
-    _userRepository = userRepository;
+    IUserRepository _userRepository;
+    IMapper _mapper;
 
-    _mapper = new Mapper(new MapperConfiguration(cfg =>
+    public UserControllerEntityFramework(IConfiguration config, IUserRepository userRepository)
     {
-      cfg.CreateMap<UserDto, User>();
-    }));
+      _userRepository = userRepository;
 
-  }
+      _mapper = new Mapper(new MapperConfiguration(cfg =>
+      {
+        cfg.CreateMap<UserDto, User>();
+      }));
 
-  [HttpGet("ef.get.users")]
-  public IEnumerable<User> GetUsers()
-  {
-    IEnumerable<User> users = _userRepository.GetUsers();
-    return users;
-  }
-
-  [HttpGet("ef.get.user/{userId}")]
-  public User GetUser(int userId)
-  {
-    return _userRepository.GetUser(userId);
-  }
-
-  [HttpPost("ef.post.user")]
-  public IActionResult PostUser(UserDto user)
-  {
-    User userDb = _mapper.Map<User>(user);
-
-    _userRepository.AddEntity<User>(userDb);
-    if (_userRepository.SaveChanges())
-    {
-      return Ok();
     }
 
-    throw new Exception("Failed to Add User");
-  }
-
-  [HttpPut("ef.put.user")]
-  public IActionResult PutUser(User user)
-  {
-    User? userDb = _userRepository.GetUser(user.UserId);
-
-    if (userDb != null)
+    [HttpGet("ef.get.users")]
+    public IEnumerable<User> GetUsers()
     {
-      userDb.Active = user.Active;
-      userDb.FirstName = user.FirstName;
-      userDb.LastName = user.LastName;
-      userDb.Email = user.Email;
-      userDb.Gender = user.Gender;
+      IEnumerable<User> users = _userRepository.GetUsers();
+      return users;
+    }
+
+    [HttpGet("ef.get.user/{userId}")]
+    public User GetUser(int userId)
+    {
+      return _userRepository.GetUser(userId);
+    }
+
+    [HttpPost("ef.post.user")]
+    public IActionResult PostUser(UserDto user)
+    {
+      User userDb = _mapper.Map<User>(user);
+
+      _userRepository.AddEntity<User>(userDb);
       if (_userRepository.SaveChanges())
       {
         return Ok();
       }
 
-      throw new Exception("Failed to Update User");
+      throw new Exception("Failed to Add User");
     }
 
-    throw new Exception("Failed to Get User");
-  }
-
-  [HttpDelete("ef.delete.user/{userId}")]
-  public IActionResult DeleteUser(int userId)
-  {
-    User? userDb = _userRepository.GetUser(userId);
-
-    if (userDb != null)
+    [HttpPut("ef.put.user")]
+    public IActionResult PutUser(User user)
     {
-      _userRepository.RemoveEntity<User>(userDb);
-      if (_userRepository.SaveChanges())
+      User? userDb = _userRepository.GetUser(user.UserId);
+
+      if (userDb != null)
       {
-        return Ok();
+        userDb.Active = user.Active;
+        userDb.FirstName = user.FirstName;
+        userDb.LastName = user.LastName;
+        userDb.Email = user.Email;
+        userDb.Gender = user.Gender;
+        if (_userRepository.SaveChanges())
+        {
+          return Ok();
+        }
+
+        throw new Exception("Failed to Update User");
       }
 
-      throw new Exception("Failed to Delete User");
+      throw new Exception("Failed to Get User");
     }
 
-    throw new Exception("Failed to Get User");
+    [HttpDelete("ef.delete.user/{userId}")]
+    public IActionResult DeleteUser(int userId)
+    {
+      User? userDb = _userRepository.GetUser(userId);
+
+      if (userDb != null)
+      {
+        _userRepository.RemoveEntity<User>(userDb);
+        if (_userRepository.SaveChanges())
+        {
+          return Ok();
+        }
+
+        throw new Exception("Failed to Delete User");
+      }
+
+      throw new Exception("Failed to Get User");
+    }
   }
 }

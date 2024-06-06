@@ -1,7 +1,7 @@
 using DotnetApi.Data;
 using DotnetApi.Models;
 
-namespace DotnetAPI.Data
+namespace DotnetApi.Data
 {
   public class UserRepository : IUserRepository
   {

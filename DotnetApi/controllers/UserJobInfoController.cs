@@ -2,38 +2,39 @@ using DotnetApi.Data;
 using DotnetApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DotnetApi.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class UserJobInfoController : ControllerBase
+namespace DotnetApi.Controllers
 {
-  DataContextDapper _dapper;
 
-  public UserJobInfoController(IConfiguration config)
+  [ApiController]
+  [Route("[controller]")]
+  public class UserJobInfoController : ControllerBase
   {
-    _dapper = new DataContextDapper(config);
-  }
+    DataContextDapper _dapper;
+
+    public UserJobInfoController(IConfiguration config)
+    {
+      _dapper = new DataContextDapper(config);
+    }
 
 
-  [HttpGet("get.user.job.info/{id}")]
-  public UserJobInfo GetUserJobInfo(int id)
-  {
-    string sql = $@"
+    [HttpGet("get.user.job.info/{id}")]
+    public UserJobInfo GetUserJobInfo(int id)
+    {
+      string sql = $@"
     SELECT  [UserId],
       [JobTitle],
       [Department] 
     FROM  AppSchema.UserJobInfo
     WHERE [UserId] = {id};
     ";
-    UserJobInfo userJobInfo = _dapper.LoadDataSingle<UserJobInfo>(sql);
-    return userJobInfo;
-  }
+      UserJobInfo userJobInfo = _dapper.LoadDataSingle<UserJobInfo>(sql);
+      return userJobInfo;
+    }
 
-  [HttpPost("post.user.job.info")]
-  public IActionResult PostUserJobInfo(UserJobInfo userJobInfo)
-  {
-    string sql = $@"
+    [HttpPost("post.user.job.info")]
+    public IActionResult PostUserJobInfo(UserJobInfo userJobInfo)
+    {
+      string sql = $@"
     INSERT INTO AppSchema.UserJobInfo(
       [UserId], [JobTitle], [Department] 
     ) VALUES (
@@ -42,44 +43,45 @@ public class UserJobInfoController : ControllerBase
       '{userJobInfo.Department}'
     );
     ";
-    if (_dapper.ExecuteSql(sql))
-    {
-      return Ok();
+      if (_dapper.ExecuteSql(sql))
+      {
+        return Ok();
+      }
+
+      throw new Exception("Unable to post user's job info");
     }
 
-    throw new Exception("Unable to post user's job info");
-  }
-
-  [HttpPut("put.user.job.info")]
-  public IActionResult PutUser(UserJobInfo userJobInfo)
-  {
-    string sql = $@"
+    [HttpPut("put.user.job.info")]
+    public IActionResult PutUser(UserJobInfo userJobInfo)
+    {
+      string sql = $@"
     UPDATE AppSchema.UserJobInfo
       SET 
         [JobTitle] = '{userJobInfo.JobTitle}', 
         [Department] = '{userJobInfo.Department}'
     WHERE [UserId] = {userJobInfo.UserId}; 
     ";
-    if (_dapper.ExecuteSql(sql))
-    {
-      return Ok();
+      if (_dapper.ExecuteSql(sql))
+      {
+        return Ok();
+      }
+
+      throw new Exception("Unable to put to user's job info");
     }
 
-    throw new Exception("Unable to put to user's job info");
-  }
-
-  [HttpDelete("delete.user.job.info/{id}")]
-  public IActionResult DeleteUser(int id)
-  {
-    string sql = $@"
+    [HttpDelete("delete.user.job.info/{id}")]
+    public IActionResult DeleteUser(int id)
+    {
+      string sql = $@"
     DELETE AppSchema.UserJobInfo
     WHERE [UserId] = {id};
     ";
-    if (_dapper.ExecuteSqlWithRowCount(sql) > 0)
-    {
-      return Ok();
-    }
+      if (_dapper.ExecuteSqlWithRowCount(sql) > 0)
+      {
+        return Ok();
+      }
 
-    throw new Exception("Unable to delete to user's job info");
+      throw new Exception("Unable to delete to user's job info");
+    }
   }
 }

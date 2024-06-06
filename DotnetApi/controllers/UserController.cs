@@ -3,22 +3,22 @@ using DotnetApi.Dtos;
 using DotnetApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DotnetApi.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class UserController : ControllerBase
+namespace DotnetApi.Controllers
 {
-  DataContextDapper _dapper;
-  public UserController(IConfiguration config)
+  [ApiController]
+  [Route("[controller]")]
+  public class UserController : ControllerBase
   {
-    _dapper = new DataContextDapper(config);
-  }
+    DataContextDapper _dapper;
+    public UserController(IConfiguration config)
+    {
+      _dapper = new DataContextDapper(config);
+    }
 
-  [HttpGet("get.users")]
-  public IEnumerable<User> GetUsers()
-  {
-    string sql = @"
+    [HttpGet("get.users")]
+    public IEnumerable<User> GetUsers()
+    {
+      string sql = @"
     SELECT [UserId],
       [FirstName],
       [LastName],
@@ -27,14 +27,14 @@ public class UserController : ControllerBase
       [Active] 
     FROM  AppSchema.Users;
     ";
-    IEnumerable<User> users = _dapper.LoadData<User>(sql);
-    return users;
-  }
+      IEnumerable<User> users = _dapper.LoadData<User>(sql);
+      return users;
+    }
 
-  [HttpGet("get.user/{id}")]
-  public User GetUser(int id)
-  {
-    string sql = $@"
+    [HttpGet("get.user/{id}")]
+    public User GetUser(int id)
+    {
+      string sql = $@"
     SELECT [UserId],
       [FirstName],
       [LastName],
@@ -44,14 +44,14 @@ public class UserController : ControllerBase
     FROM  AppSchema.Users
     WHERE [UserId] = {id};
     ";
-    User user = _dapper.LoadDataSingle<User>(sql);
-    return user;
-  }
+      User user = _dapper.LoadDataSingle<User>(sql);
+      return user;
+    }
 
-  [HttpPost("post.user")]
-  public IActionResult PostUser(UserDto user)
-  {
-    string sql = $@"
+    [HttpPost("post.user")]
+    public IActionResult PostUser(UserDto user)
+    {
+      string sql = $@"
     INSERT INTO AppSchema.Users(
       [FirstName], [LastName], [Email], [Gender], [Active]
     ) VALUES (
@@ -62,18 +62,18 @@ public class UserController : ControllerBase
       '{user.Active}'
     );
     ";
-    if (_dapper.ExecuteSql(sql))
-    {
-      return Ok();
+      if (_dapper.ExecuteSql(sql))
+      {
+        return Ok();
+      }
+
+      throw new Exception("Unable to post user");
     }
 
-    throw new Exception("Unable to post user");
-  }
-
-  [HttpPut("put.user")]
-  public IActionResult PutUser(User user)
-  {
-    string sql = $@"
+    [HttpPut("put.user")]
+    public IActionResult PutUser(User user)
+    {
+      string sql = $@"
     UPDATE AppSchema.Users
       SET 
         [FirstName] = '{user.FirstName}',
@@ -83,26 +83,27 @@ public class UserController : ControllerBase
         [Active] = '{user.Active}'
     WHERE [UserId] = {user.UserId};
     ";
-    if (_dapper.ExecuteSql(sql))
-    {
-      return Ok();
+      if (_dapper.ExecuteSql(sql))
+      {
+        return Ok();
+      }
+
+      throw new Exception("Unable to put to user");
     }
 
-    throw new Exception("Unable to put to user");
-  }
-
-  [HttpDelete("delete.user/{id}")]
-  public IActionResult DeleteUser(int id)
-  {
-    string sql = $@"
+    [HttpDelete("delete.user/{id}")]
+    public IActionResult DeleteUser(int id)
+    {
+      string sql = $@"
     DELETE AppSchema.Users
     WHERE [UserId] = {id};
     ";
-    if (_dapper.ExecuteSqlWithRowCount(sql) > 0)
-    {
-      return Ok();
-    }
+      if (_dapper.ExecuteSqlWithRowCount(sql) > 0)
+      {
+        return Ok();
+      }
 
-    throw new Exception("Unable to delete to user");
+      throw new Exception("Unable to delete to user");
+    }
   }
 }
