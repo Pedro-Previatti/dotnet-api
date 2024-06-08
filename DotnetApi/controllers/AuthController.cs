@@ -65,7 +65,23 @@ namespace DotnetApi.Controllers
 
           if (_dapper.ExecuteSqlWithParameters(sql, sqlParameters))
           {
-            return Ok();
+
+            string addUserSql = $@"
+              INSERT INTO AppSchema.Users(
+                [FirstName], [LastName], [Email], [Gender], [Active]
+              ) VALUES (
+                '{registrationUser.FirstName}',
+                '{registrationUser.LastName}', 
+                '{registrationUser.Email}',
+                '{registrationUser.Gender}',
+                1
+              );
+            ";
+            if (_dapper.ExecuteSql(addUserSql))
+            {
+              return Ok();
+            }
+            throw new Exception("Failed to add user");
           }
           throw new Exception("Failed to register user");
         }
