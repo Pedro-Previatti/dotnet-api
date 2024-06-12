@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "1tZSs0guQo9YZdbVBSwRKjlgoLtzGg6sBZpaKmO3Up0f0SIxOB1D2GICjOaumELPe17ZiRHtaMmHeg0dc/hqyA==",
+  "dgSpecHash": "kCDtASbtF1c9YF8Vuis169Fnuujw//geOHQNmR4PidQZZFXF1nfKjEek52n5y84edsbqWHS/6WUOJYAVqOOhkw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj",
+  "projectFilePath": "C:\\Users\\Pedro Previatti\\dotnet-api\\dotnetapi\\DotnetApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Pedro Previatti\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\Pedro Previatti\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
