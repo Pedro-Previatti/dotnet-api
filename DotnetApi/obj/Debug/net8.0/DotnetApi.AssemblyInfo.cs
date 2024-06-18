@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DotnetApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+399d2a52c6c809f296d4c29f85993d76e844f39c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05d70893553b1591fd9e9c9196cee5e8c2d16f44")]
 [assembly: System.Reflection.AssemblyProductAttribute("DotnetApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DotnetApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

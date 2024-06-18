@@ -130,20 +130,32 @@ namespace DotnetApi.Controllers
     }
 
     [HttpGet("refresh.token")]
-    public string RefreshToken()
+    public IActionResult RefreshToken()
     {
-      string id = User.FindFirst("userId")?.Value + "";
-      Console.WriteLine("id: " + id);
-      string sql = @"
-        SELECT UserId FROM AppSchema.Users WHERE UserId = '" +
-        id + "'";
+      string? userIdClaim = User.FindFirst("usr")?.Value;
+      if (string.IsNullOrEmpty(userIdClaim))
+      {
+        return Unauthorized("Invalid token: user ID not found.");
+      }
 
-      Console.WriteLine(sql);
+      int userId;
+      if (!int.TryParse(userIdClaim, out userId))
+      {
+        return Unauthorized("Invalid token: user ID is not valid.");
+      }
 
-      int userId = _dapper.LoadDataSingle<int>(sql);
-      Console.WriteLine("userId: " + userId);
+      string sql = $@"SELECT UserId FROM AppSchema.Users WHERE UserId = {userId}";
+      int userIdFromDb;
+      try
+      {
+        userIdFromDb = _dapper.LoadDataSingle<int>(sql);
+      }
+      catch (InvalidOperationException)
+      {
+        return NotFound("User not found");
+      }
 
-      return CreateToken(userId);
+      return Ok(new { token = CreateToken(userIdFromDb) });
     }
 
     private byte[] GetPasswordHash(string password, byte[] passwordSalt)
