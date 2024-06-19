@@ -1,7 +1,7 @@
 using AutoMapper;
 using DotnetApi.Data;
 using DotnetApi.Models;
-using DotnetAPI.Controllers;
+using DotnetApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetApi.Controllers

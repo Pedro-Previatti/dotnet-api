@@ -4,7 +4,7 @@ using DotnetApi.Dtos;
 using DotnetApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DotnetAPI.Controllers
+namespace DotnetApi.Controllers
 {
 
   [ApiController]
