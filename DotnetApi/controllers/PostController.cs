@@ -66,5 +66,63 @@ namespace DotnetApi.Controllers
 
       return _dapper.LoadData<Post>(sql);
     }
+
+    [HttpPost("add.post")]
+    public IActionResult AddPost(PostToAddDto post)
+    {
+      string sql = @$"
+        INSERT INTO AppSchema.Posts (
+          [UserId], [PostTitle], [PostContent], [PostCreated], [PostUpdated]
+        ) VALUES (
+          {this.User.FindFirst("usr")?.Value},
+          '{post.PostTitle}',
+          '{post.PostContent}',
+          GETDATE(),
+          GETDATE()
+        )
+      ";
+
+      if (_dapper.ExecuteSql(sql))
+      {
+        return Ok();
+      }
+      throw new Exception("Failed to create post.");
+    }
+
+    [HttpPut("edit.post")]
+    public IActionResult EditPost(PostToEditDto post)
+    {
+      string sql = @$"
+        UPDATE AppSchema.Posts
+          SET 
+            [PostTitle] = '{post.PostTitle}',
+            [PostContent] = '{post.PostContent}',
+            [PostUpdated] = GETDATE()
+        WHERE [PostId] = {post.PostId.ToString()}
+        AND [UserId] = {this.User.FindFirst("usr")?.Value};
+      ";
+
+      if (_dapper.ExecuteSql(sql))
+      {
+        return Ok();
+      }
+      throw new Exception("Failed to edit post.");
+    }
+
+    [HttpDelete("delete.post/{postId}")]
+    public IActionResult DeletePost(int postId)
+    {
+      string sql = @$"
+        DELETE FROM AppSchema.Posts 
+        WHERE [PostId] = {postId.ToString()}
+        AND [UserId] = {this.User.FindFirst("usr")?.Value}
+      ";
+
+      if (_dapper.ExecuteSql(sql))
+      {
+        return Ok();
+      }
+      throw new Exception("Failed to delete post.");
+    }
   }
 }
