@@ -124,5 +124,19 @@ namespace DotnetApi.Controllers
       }
       throw new Exception("Failed to delete post.");
     }
+
+    [HttpGet("search.post/{searchParam}")]
+    public IEnumerable<Post> SearchPosts(string searchParam)
+    {
+      string sql = @$"
+        SELECT 
+          [PostId], [UserId], [PostTitle], [PostContent], [PostCreated], [PostUpdated] 
+        FROM AppSchema.Posts
+        WHERE [PostTitle] LIKE '%{searchParam}%'
+        OR [PostContent] LIKE '%{searchParam}%'
+      ";
+
+      return _dapper.LoadData<Post>(sql);
+    }
   }
 }
