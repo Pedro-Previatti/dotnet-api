@@ -71,8 +71,8 @@ namespace DotnetApi.Controllers
       throw new Exception("Failed to upsert post.");
     }
 
-    [HttpDelete("delete.post/{userId}/{postId}")]
-    public IActionResult DeletePost(int userId, int postId = 0)
+    [HttpDelete("delete.post/{userId}")]
+    public IActionResult DeletePost(int postId = 0)
     {
       string sql = @$"EXEC AppSchema.spPosts_Delete
         @UserId={this.User.FindFirst("usr")?.Value}";
