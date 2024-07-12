@@ -18,7 +18,7 @@ namespace DotnetApi.Controllers
     [HttpGet("get.users/{id}/{active}")]
     public IEnumerable<UserComplete> GetUsers(int id, bool active)
     {
-      string sql = $"EXEC AppSchema.spUser_Get ";
+      string sql = "EXEC AppSchema.spUser_Get";
       string parameters = "";
 
       if (id != 0)
@@ -30,7 +30,10 @@ namespace DotnetApi.Controllers
         parameters += $", @Active={active.ToString()}";
       }
 
-      sql += parameters.Substring(1);
+      if (parameters.Length > 0)
+      {
+        sql += parameters.Substring(1);
+      }
 
       IEnumerable<UserComplete> users = _dapper.LoadData<UserComplete>(sql);
       return users;
@@ -61,7 +64,7 @@ namespace DotnetApi.Controllers
     public IActionResult DeleteUser(int id)
     {
       string sql = $@"AppSchema.spUser_Delete
-    @UserId={id}";
+    @UserId={id.ToString()}";
       if (_dapper.ExecuteSqlWithRowCount(sql) > 0)
       {
         return Ok();
