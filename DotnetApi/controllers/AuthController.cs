@@ -49,44 +49,44 @@ namespace DotnetApi.Controllers
 
           byte[] passwordHash = _authHelper.GetPasswordHash(registrationUser.Password, passwordSalt);
 
-          sql = $@"
-            INSERT INTO AppSchema.Auth(
-              [Email],
-              [PasswordHash],
-              [PasswordSalt]
-            ) VALUES (
-              '{registrationUser.Email}',
-              @PasswordHash,
-              @PasswordSalt
-            );
-          ";
+          string newUserSql = @"AppSchema.spRegistration_Upsert
+                @Email=@EmailParam,
+                @PasswordHash=@PHashParam,
+                @PasswordSalt=@PSaltParam";
 
-          List<SqlParameter> sqlParameters = new List<SqlParameter>();
+          List<SqlParameter> sqlParameters = new List<SqlParameter>
+            {
+                new SqlParameter("@EmailParam", SqlDbType.NVarChar) { Value = registrationUser.Email },
+                new SqlParameter("@PHashParam", SqlDbType.VarBinary) { Value = passwordHash },
+                new SqlParameter("@PSaltParam", SqlDbType.VarBinary) { Value = passwordSalt }
+            };
 
-          SqlParameter passwordHashParameter = new SqlParameter("@PasswordHash", SqlDbType.VarBinary);
-          passwordHashParameter.Value = passwordHash;
-
-          SqlParameter passwordSaltParameter = new SqlParameter("@PasswordSalt", SqlDbType.VarBinary);
-          passwordSaltParameter.Value = passwordSalt;
-
-          sqlParameters.Add(passwordHashParameter);
-          sqlParameters.Add(passwordSaltParameter);
-
-          if (_dapper.ExecuteSqlWithParameters(sql, sqlParameters))
+          if (_dapper.ExecuteSqlWithParameters(newUserSql, sqlParameters))
           {
+            string addUserSql = @"EXEC AppSchema.spUser_Upsert 
+                    @FirstName=@FirstNameParam,
+                    @LastName=@LastNameParam, 
+                    @Email=@EmailParam,
+                    @Gender=@GenderParam,
+                    @Active=@ActiveParam,
+                    @JobTitle=@JobTitleParam,
+                    @Department=@DepartmentParam,
+                    @Salary=@SalaryParam,
+                    @UserId=0";
 
-            string addUserSql = $@"
-              INSERT INTO AppSchema.Users(
-                [FirstName], [LastName], [Email], [Gender], [Active]
-              ) VALUES (
-                '{registrationUser.FirstName}',
-                '{registrationUser.LastName}', 
-                '{registrationUser.Email}',
-                '{registrationUser.Gender}',
-                1
-              );
-            ";
-            if (_dapper.ExecuteSql(addUserSql))
+            List<SqlParameter> userSqlParameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@FirstNameParam", SqlDbType.NVarChar) { Value = registrationUser.FirstName },
+                    new SqlParameter("@LastNameParam", SqlDbType.NVarChar) { Value = registrationUser.LastName },
+                    new SqlParameter("@EmailParam", SqlDbType.NVarChar) { Value = registrationUser.Email },
+                    new SqlParameter("@GenderParam", SqlDbType.NVarChar) { Value = registrationUser.Gender },
+                    new SqlParameter("@ActiveParam", SqlDbType.Bit) { Value = 1 },
+                    new SqlParameter("@JobTitleParam", SqlDbType.NVarChar) { Value = registrationUser.JobTitle },
+                    new SqlParameter("@DepartmentParam", SqlDbType.NVarChar) { Value = registrationUser.Department },
+                    new SqlParameter("@SalaryParam", SqlDbType.Decimal) { Value = registrationUser.Salary }
+                };
+
+            if (_dapper.ExecuteSqlWithParameters(addUserSql, userSqlParameters))
             {
               return Ok();
             }
@@ -98,6 +98,7 @@ namespace DotnetApi.Controllers
       }
       throw new Exception("Passwords do not match");
     }
+
 
     [AllowAnonymous]
     [HttpPost("login")]
