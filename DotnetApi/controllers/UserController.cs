@@ -1,5 +1,7 @@
+using System.Data;
+using Dapper;
 using DotnetApi.Data;
-using DotnetApi.Dtos;
+using DotnetApi.Helpers;
 using DotnetApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,50 +11,45 @@ namespace DotnetApi.Controllers
   [Route("[controller]")]
   public class UserController : ControllerBase
   {
-    DataContextDapper _dapper;
+    private readonly DataContextDapper _dapper;
+    private readonly ReusableSql _reusableSql;
     public UserController(IConfiguration config)
     {
       _dapper = new DataContextDapper(config);
+      _reusableSql = new ReusableSql(config);
     }
 
     [HttpGet("get.users/{id}/{active}")]
     public IEnumerable<User> GetUsers(int id, bool active)
     {
       string sql = "EXEC AppSchema.spUser_Get";
-      string parameters = "";
+      string sqlParameters = "";
+      DynamicParameters parameters = new DynamicParameters();
 
       if (id != 0)
       {
-        parameters += $", @UserId={id.ToString()}";
+        sqlParameters += ", @UserId=@UserIdParameter";
+        parameters.Add("@UserIdParameter", id, DbType.Int32);
       }
       if (active)
       {
-        parameters += $", @Active={active.ToString()}";
+        sqlParameters += ", @Active=@ActiveParameter";
+        parameters.Add("@ActiveParameter", active, DbType.Int32);
       }
 
-      if (parameters.Length > 0)
+      if (sqlParameters.Length > 0)
       {
-        sql += parameters.Substring(1);
+        sql += sqlParameters.Substring(1);
       }
 
-      IEnumerable<User> users = _dapper.LoadData<User>(sql);
+      IEnumerable<User> users = _dapper.LoadDataWithParameters<User>(sql, parameters);
       return users;
     }
 
     [HttpPut("upsert.user")]
     public IActionResult UpsertUser(User user)
     {
-      string sql = $@"EXEC AppSchema.spUser_Upsert 
-        @FirstName='{user.FirstName}',
-        @LastName='{user.LastName}', 
-        @Email='{user.Email}',
-        @Gender='{user.Gender}',
-        @JobTitle='{user.JobTitle}',
-        @Department='{user.Department}',
-        @Salary='{user.Salary}',
-        @Active='{user.Active}',
-        @UserId='{user.UserId}'";
-      if (_dapper.ExecuteSql(sql))
+      if (_reusableSql.UpsertUser(user))
       {
         return Ok();
       }
@@ -64,8 +61,12 @@ namespace DotnetApi.Controllers
     public IActionResult DeleteUser(int id)
     {
       string sql = $@"AppSchema.spUser_Delete
-    @UserId={id.ToString()}";
-      if (_dapper.ExecuteSqlWithRowCount(sql) > 0)
+        @UserId=@UserIdParameter";
+
+      DynamicParameters parameters = new DynamicParameters();
+      parameters.Add("@UserIdParameter", id, DbType.Int32);
+
+      if (_dapper.ExecuteSqlWithParameters(sql, parameters))
       {
         return Ok();
       }

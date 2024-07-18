@@ -1,17 +1,12 @@
 using System.Data;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+using AutoMapper;
 using DotnetApi.Data;
 using DotnetApi.Dtos;
 using DotnetApi.Helpers;
 using DotnetApi.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using Microsoft.IdentityModel.Tokens;
 
 namespace DotnetApi.Controllers
 {
@@ -21,14 +16,19 @@ namespace DotnetApi.Controllers
   public class AuthController : ControllerBase
   {
     private readonly DataContextDapper _dapper;
-    private readonly IConfiguration _config;
     private readonly AuthHelper _authHelper;
+    private readonly ReusableSql _reusableSql;
+    private readonly IMapper _mapper;
 
     public AuthController(IConfiguration config)
     {
       _dapper = new DataContextDapper(config);
-      _config = config;
-      _authHelper = new(config);
+      _authHelper = new AuthHelper(config);
+      _reusableSql = new ReusableSql(config);
+      _mapper = new Mapper(new MapperConfiguration(cfg =>
+      {
+        cfg.CreateMap<RegistrationDto, User>();
+      }));
     }
 
     [AllowAnonymous]
@@ -49,30 +49,8 @@ namespace DotnetApi.Controllers
           };
           if (_authHelper.SetPassword(passwordSetupUser))
           {
-            string addUserSql = @"EXEC AppSchema.spUser_Upsert 
-                    @FirstName=@FirstNameParam,
-                    @LastName=@LastNameParam, 
-                    @Email=@EmailParam,
-                    @Gender=@GenderParam,
-                    @Active=@ActiveParam,
-                    @JobTitle=@JobTitleParam,
-                    @Department=@DepartmentParam,
-                    @Salary=@SalaryParam,
-                    @UserId=0";
-
-            List<SqlParameter> userSqlParameters = new List<SqlParameter>
-                {
-                    new SqlParameter("@FirstNameParam", SqlDbType.NVarChar) { Value = registrationUser.FirstName },
-                    new SqlParameter("@LastNameParam", SqlDbType.NVarChar) { Value = registrationUser.LastName },
-                    new SqlParameter("@EmailParam", SqlDbType.NVarChar) { Value = registrationUser.Email },
-                    new SqlParameter("@GenderParam", SqlDbType.NVarChar) { Value = registrationUser.Gender },
-                    new SqlParameter("@ActiveParam", SqlDbType.Bit) { Value = 1 },
-                    new SqlParameter("@JobTitleParam", SqlDbType.NVarChar) { Value = registrationUser.JobTitle },
-                    new SqlParameter("@DepartmentParam", SqlDbType.NVarChar) { Value = registrationUser.Department },
-                    new SqlParameter("@SalaryParam", SqlDbType.Decimal) { Value = registrationUser.Salary }
-                };
-
-            if (_dapper.ExecuteSqlWithParameters(addUserSql, userSqlParameters))
+            User user = _mapper.Map<User>(registrationUser);
+            if (_reusableSql.UpsertUser(user))
             {
               return Ok();
             }

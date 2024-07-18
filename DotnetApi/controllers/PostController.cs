@@ -1,3 +1,5 @@
+using System.Data;
+using Dapper;
 using DotnetApi.Data;
 using DotnetApi.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -20,72 +22,87 @@ namespace DotnetApi.Controllers
     public IEnumerable<Post> GetPosts(int postId = 0, int userId = 0, string param = "None")
     {
       string sql = "EXEC AppSchema.spPosts_Get";
-      string parameters = "";
+      string stringParameters = "";
+
+      DynamicParameters parameters = new DynamicParameters();
 
       if (postId != 0)
       {
-        parameters += $", @PostId={postId.ToString()}";
+        stringParameters += ", @PostId=@PostIdParameter";
+        parameters.Add("@PostIdParameter", postId, DbType.Int32);
       }
       if (userId != 0)
       {
-        parameters += $", @UserId={userId.ToString()}";
+        stringParameters += ", @UserId=@UserIdParameter";
+        parameters.Add("@UserIdParameter", userId, DbType.Int32);
       }
       if (param != "None")
       {
-        parameters += $", @SearchValue='{param}'";
+        stringParameters += ", @SearchValue=@SearchValueParameter";
+        parameters.Add("@SearchValueParameter", param, DbType.String);
       }
 
-      if (parameters.Length > 0)
+      if (stringParameters.Length > 0)
       {
-        sql += parameters.Substring(1);
+        sql += stringParameters.Substring(1);
       }
 
-      return _dapper.LoadData<Post>(sql);
+      return _dapper.LoadDataWithParameters<Post>(sql, parameters);
     }
 
     [HttpGet("my.posts")]
     public IEnumerable<Post> GetMyPosts()
     {
-      string sql = $"EXEC AppSchema.spPosts_Get @UserId='{this.User.FindFirst("usr")?.Value}'";
+      string sql = "EXEC AppSchema.spPosts_Get @UserId=@UserIdParameter";
+      DynamicParameters parameters = new DynamicParameters();
+      parameters.Add("@UserIdParameter", this.User.FindFirst("usr")?.Value, DbType.Int32);
 
-      return _dapper.LoadData<Post>(sql);
+      return _dapper.LoadDataWithParameters<Post>(sql, parameters);
     }
 
     [HttpPost("upsert.post")]
     public IActionResult UpsertPost(Post post)
     {
-      string sql = @$"EXEC AppSchema.spPosts_Upsert
-        @UserId={this.User.FindFirst("usr")?.Value},
-        @PostTitle={post.PostTitle},
-        @PostContent={post.PostContent}";
+      string sql = @"EXEC AppSchema.spPosts_Upsert
+        @UserId=@UserIdParameter,
+        @PostTitle=@PostTitleParameter
+        @PostContent=@PostContentParameter";
+
+      DynamicParameters parameters = new DynamicParameters();
+      parameters.Add("@UserIdParameter", this.User.FindFirst("usr")?.Value, DbType.Int32);
+      parameters.Add("@PostTitleParameter", post.PostTitle, DbType.String);
+      parameters.Add("@PostContentParameter", post.PostContent, DbType.String);
 
       if (post.PostId > 0)
       {
-        sql += ", @PostId={post.PostId}";
+        sql += ", @PostId=@PostIdParameter";
+        parameters.Add("@PostContentParameter", post.PostId, DbType.Int32);
       }
 
-      if (_dapper.ExecuteSql(sql))
+      if (_dapper.ExecuteSqlWithParameters(sql, parameters))
       {
         return Ok();
       }
+
       throw new Exception("Failed to upsert post.");
     }
 
     [HttpDelete("delete.post/{userId}")]
-    public IActionResult DeletePost(int postId = 0)
+    public IActionResult DeletePost(int postId)
     {
-      string sql = @$"EXEC AppSchema.spPosts_Delete
-        @UserId={this.User.FindFirst("usr")?.Value}";
+      string sql = @"EXEC AppSchema.spPosts_Delete
+        @UserId=@UserIdParameter,
+        @PostId=@PostIdParameter";
 
-      if (postId > 0)
-      {
-        sql += ", @PostId={postId.ToString()}";
-      }
+      DynamicParameters parameters = new DynamicParameters();
+      parameters.Add("@UserIdParameter", this.User.FindFirst("usr")?.Value, DbType.Int32);
+      parameters.Add("@PostIdParameter", postId, DbType.Int32);
 
-      if (_dapper.ExecuteSql(sql))
+      if (_dapper.ExecuteSqlWithParameters(sql, parameters))
       {
         return Ok();
       }
+
       throw new Exception("Failed to delete post.");
     }
   }
