@@ -6,6 +6,7 @@ using System.Text;
 using DotnetApi.Data;
 using DotnetApi.Dtos;
 using DotnetApi.Helpers;
+using DotnetApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
@@ -41,27 +42,12 @@ namespace DotnetApi.Controllers
         IEnumerable<string> existingUsers = _dapper.LoadData<string>(sql);
         if (existingUsers.Count() == 0)
         {
-          byte[] passwordSalt = new byte[128 / 8];
-          using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+          LoginDto passwordSetupUser = new LoginDto()
           {
-            rng.GetNonZeroBytes(passwordSalt);
-          }
-
-          byte[] passwordHash = _authHelper.GetPasswordHash(registrationUser.Password, passwordSalt);
-
-          string newUserSql = @"AppSchema.spRegistration_Upsert
-                @Email=@EmailParam,
-                @PasswordHash=@PHashParam,
-                @PasswordSalt=@PSaltParam";
-
-          List<SqlParameter> sqlParameters = new List<SqlParameter>
-            {
-                new SqlParameter("@EmailParam", SqlDbType.NVarChar) { Value = registrationUser.Email },
-                new SqlParameter("@PHashParam", SqlDbType.VarBinary) { Value = passwordHash },
-                new SqlParameter("@PSaltParam", SqlDbType.VarBinary) { Value = passwordSalt }
-            };
-
-          if (_dapper.ExecuteSqlWithParameters(newUserSql, sqlParameters))
+            Email = registrationUser.Email,
+            Password = registrationUser.Password
+          };
+          if (_authHelper.SetPassword(passwordSetupUser))
           {
             string addUserSql = @"EXEC AppSchema.spUser_Upsert 
                     @FirstName=@FirstNameParam,
@@ -99,6 +85,15 @@ namespace DotnetApi.Controllers
       throw new Exception("Passwords do not match");
     }
 
+    [HttpPost("reset.password")]
+    public IActionResult ResetPassword(LoginDto user)
+    {
+      if (_authHelper.SetPassword(user))
+      {
+        return Ok();
+      }
+      throw new Exception("Failed to update password");
+    }
 
     [AllowAnonymous]
     [HttpPost("login")]
