@@ -15,89 +15,56 @@ namespace DotnetApi.Controllers
       _dapper = new DataContextDapper(config);
     }
 
-    [HttpGet("get.users")]
-    public IEnumerable<User> GetUsers()
+    [HttpGet("get.users/{id}/{active}")]
+    public IEnumerable<User> GetUsers(int id, bool active)
     {
-      string sql = @"
-    SELECT [UserId],
-      [FirstName],
-      [LastName],
-      [Email],
-      [Gender],
-      [Active] 
-    FROM  AppSchema.Users;
-    ";
+      string sql = "EXEC AppSchema.spUser_Get";
+      string parameters = "";
+
+      if (id != 0)
+      {
+        parameters += $", @UserId={id.ToString()}";
+      }
+      if (active)
+      {
+        parameters += $", @Active={active.ToString()}";
+      }
+
+      if (parameters.Length > 0)
+      {
+        sql += parameters.Substring(1);
+      }
+
       IEnumerable<User> users = _dapper.LoadData<User>(sql);
       return users;
     }
 
-    [HttpGet("get.user/{id}")]
-    public User GetUser(int id)
+    [HttpPut("upsert.user")]
+    public IActionResult UpsertUser(User user)
     {
-      string sql = $@"
-    SELECT [UserId],
-      [FirstName],
-      [LastName],
-      [Email],
-      [Gender],
-      [Active] 
-    FROM  AppSchema.Users
-    WHERE [UserId] = {id};
-    ";
-      User user = _dapper.LoadDataSingle<User>(sql);
-      return user;
-    }
-
-    [HttpPost("post.user")]
-    public IActionResult PostUser(UserDto user)
-    {
-      string sql = $@"
-    INSERT INTO AppSchema.Users(
-      [FirstName], [LastName], [Email], [Gender], [Active]
-    ) VALUES (
-      '{user.FirstName}',
-      '{user.LastName}', 
-      '{user.Email}',
-      '{user.Gender}',
-      '{user.Active}'
-    );
-    ";
+      string sql = $@"EXEC AppSchema.spUser_Upsert 
+        @FirstName='{user.FirstName}',
+        @LastName='{user.LastName}', 
+        @Email='{user.Email}',
+        @Gender='{user.Gender}',
+        @JobTitle='{user.JobTitle}',
+        @Department='{user.Department}',
+        @Salary='{user.Salary}',
+        @Active='{user.Active}',
+        @UserId='{user.UserId}'";
       if (_dapper.ExecuteSql(sql))
       {
         return Ok();
       }
 
-      throw new Exception("Unable to post user");
-    }
-
-    [HttpPut("put.user")]
-    public IActionResult PutUser(User user)
-    {
-      string sql = $@"
-    UPDATE AppSchema.Users
-      SET 
-        [FirstName] = '{user.FirstName}',
-        [LastName] = '{user.LastName}', 
-        [Email] = '{user.Email}',
-        [Gender] = '{user.Gender}',
-        [Active] = '{user.Active}'
-    WHERE [UserId] = {user.UserId};
-    ";
-      if (_dapper.ExecuteSql(sql))
-      {
-        return Ok();
-      }
-
-      throw new Exception("Unable to put to user");
+      throw new Exception("Unable to upsert user");
     }
 
     [HttpDelete("delete.user/{id}")]
     public IActionResult DeleteUser(int id)
     {
-      string sql = $@"
-    DELETE AppSchema.Users
-    WHERE [UserId] = {id};
-    ";
+      string sql = $@"AppSchema.spUser_Delete
+    @UserId={id.ToString()}";
       if (_dapper.ExecuteSqlWithRowCount(sql) > 0)
       {
         return Ok();

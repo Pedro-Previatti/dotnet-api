@@ -5,7 +5,7 @@ namespace DotnetApi.Dtos
     public byte[] PasswordHash { get; set; }
     public byte[] PasswordSalt { get; set; }
 
-    public LoginConfirmationDto()
+    LoginConfirmationDto()
     {
       PasswordHash ??= new byte[0];
       PasswordSalt ??= new byte[0];
