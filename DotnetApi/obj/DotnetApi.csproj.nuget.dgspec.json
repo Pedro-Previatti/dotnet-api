@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Pedro Previatti\\dotnet-api\\dotnetapi\\DotnetApi.csproj": {}
+    "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Pedro Previatti\\dotnet-api\\dotnetapi\\DotnetApi.csproj": {
+    "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Pedro Previatti\\dotnet-api\\dotnetapi\\DotnetApi.csproj",
+        "projectUniqueName": "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj",
         "projectName": "DotnetApi",
-        "projectPath": "C:\\Users\\Pedro Previatti\\dotnet-api\\dotnetapi\\DotnetApi.csproj",
+        "projectPath": "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\DotnetApi.csproj",
         "packagesPath": "C:\\Users\\Pedro Previatti\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Pedro Previatti\\dotnet-api\\dotnetapi\\obj\\",
+        "outputPath": "C:\\Users\\Pedro Previatti\\dotnet-api\\DotnetApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Pedro Previatti\\AppData\\Roaming\\NuGet\\NuGet.Config"
